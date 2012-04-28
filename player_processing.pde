@@ -42,6 +42,14 @@ void stop()
   super.stop();
 }
 
+void keyReleased()
+{
+  if ( key == 'w' ) 
+    visual.toggle(1);      
+  if ( key == 'e' ) 
+    visual.toggle(2);
+}
+
 class Visual {
 
   Minim minim;
@@ -53,28 +61,28 @@ class Visual {
   float c;
   float decay[];
   AudioPlayer track;
-  int type = 0;
+  int type;
+  int num = 2;
 
   Visual(FFT fftTemp, AudioPlayer trackTemp) {
     fft = fftTemp;
     offset = height/2;
     bandSize = 25;
     strokeWeight(10);
-    c = 0;
     decay = new float[fft.specSize()];
     fft.window(FFT.HAMMING);
     t = trackTemp;
   }
   
   void toggle(int i) {
-    count = (count + i) % 10; 
+    type = (type + i) % num; 
   }
   
   void visualize()
   {
     if(type == 0)
       visual1();
-    else if(type == 2)
+    else if(type == 1)
       visual2();
   }
   
@@ -99,7 +107,7 @@ class Visual {
   }
   
   void visual2() {
-    background(0);
+    background();
     stroke(255);
     fft.forward(t.mix);
     
@@ -107,10 +115,13 @@ class Visual {
     translate(0, -offset);
     for(int i = 0; i < fft.specSize(); i++) {
       decay[i] = decay[i] * 0.9 + fft.getBand(i);
+      stroke(128*sin(i+c)+127, 128*sin(i+PI/2+c)+127, 128*cos(i-c)+127, 64); 
       pushMatrix();
       translate(0,0, fft.getBand(i)*25);
-      stroke(128*sin(i+c)+127, 128*sin(i+PI/2+c)+127, 128*cos(i-c)+127); 
-      line(i, height - decay[i], i, height + decay[i]);
+      ellipse(width/2*sin(i-c)+width/2 + decay[i], height/2*cos(i-c)+height/2 + decay[i], decay[i]/10, decay[i]/10);
+      ellipse(-width/2*sin(i-c)+width/2 - decay[i], height/2*cos(i-c)+height/2 + decay[i], decay[i]/10, decay[i]/10);
+      ellipse(-width/2*sin(i-c)+width/2 - decay[i], -height/2*cos(i-c)+height/2 - decay[i], decay[i]/10, decay[i]/10);
+      ellipse(width/2*sin(i-c)+width/2 + decay[i], -height/2*cos(i-c)+height/2 - decay[i], decay[i]/10, decay[i]/10);
       popMatrix();
     }
     fill(255);
