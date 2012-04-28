@@ -194,11 +194,11 @@ class Visual {
         int x = i*cellsize + cellsize/2;
         int y = j*cellsize + cellsize/2;
         int loc = x + y*img.width;
-        color c = img.pixels[loc];
-        int b = (int)((red(c) + green(c) + blue(c))/8);
+        color co = img.pixels[loc];
+        int b = (int)((red(co) + green(co) + blue(co))/8);
         pushMatrix();
         translate(i,j, decay[b]);
-        fill(red(c), green(c), blue(c), ((512 - decay[b]) % 256)*2);
+        fill(red(co), green(co), blue(co), ((512 - decay[b]) % 256)*2);
         rect(0, 0, cellsize, cellsize);
         popMatrix();
       }
