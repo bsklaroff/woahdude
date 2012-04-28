@@ -198,7 +198,7 @@ class Visual {
         int b = (int)((red(c) + green(c) + blue(c))/8);
         pushMatrix();
         translate(i,j, decay[b]);
-        fill(c);
+        fill(red(c), green(c), blue(c), ((512 - decay[b]) % 256)*2);
         rect(0, 0, cellsize, cellsize);
         popMatrix();
       }
