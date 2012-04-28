@@ -63,6 +63,7 @@ class Visual {
   AudioPlayer track;
   int type;
   int num = 3;
+  
 
   Visual(FFT fftTemp, AudioPlayer trackTemp) {
     fft = fftTemp;
@@ -70,6 +71,7 @@ class Visual {
     decay = new float[fft.specSize()];
     fft.window(FFT.HAMMING);
     t = trackTemp;
+    type = 2;
   }
 
   void toggle(int i) {
@@ -144,16 +146,41 @@ class Visual {
   }
 
   void visual3() {
-    background(128*sin(c)+127);
+    background(0);
     stroke(255);
-    for (int i = 0; i < fft.specSize(); i+=10) {
+    for (int i = 0; i < fft.specSize(); i++) {
       decay[i] = decay[i] * 0.9 + fft.getBand(i);
       pushMatrix();
-      translate(width/4*cos(c), height/4*sin(c), fft.getBand(i)*5);
-      fill(128*sin(i+c)+127, 128*sin(i+PI/2+c)+127, 128*cos(i-c)+127, 128*cos(i+PI/2-c)+127);
-      ellipse(width/2, height/2, decay[i], decay[i]);
+      translate((width/3+decay[i])*cos(c*50+i), (height/3+decay[i])*sin(c*50+i), fft.getBand(i)*0.5 - i*2);
+      fill(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
+      stroke(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
+      if(i % 2 == 0)
+        rect(width/2-decay[i]/2, height/2-decay[i]/2, decay[i], decay[i]);
+      else
+        rect(width/2, height/2, decay[i], decay[i]);      
       popMatrix();
     }
+  }
+  
+  void init4() {
+    
+  }
+  
+  void visual4() {
+    background(0);
+    stroke(255);
+    for (int i = 0; i < fft.specSize(); i++) {
+      decay[i] = decay[i] * 0.9 + fft.getBand(i);
+      pushMatrix();
+      translate((width/3+decay[i])*cos(c*50+i), (height/3+decay[i])*sin(c*50+i), fft.getBand(i)*0.5 - i*2);
+      fill(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
+      stroke(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
+      if(i % 2 == 0)
+        rect(width/2-decay[i]/2, height/2-decay[i]/2, decay[i], decay[i]);
+      else
+        rect(width/2, height/2, decay[i], decay[i]);      
+      popMatrix();
+    }    
   }
 }
 
