@@ -1,1 +1,9 @@
 Woahdude audio visualizer
+
+written in Processing
+
+Take FFT of audio, pass into Visual object
+
+Visual object toggles between visualization modes
+
+YaRly.jpg
