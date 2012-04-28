@@ -62,8 +62,13 @@ class Visual {
   float decay[];
   AudioPlayer track;
   int type;
-  int num = 3;
-  
+  int num = 4;
+  PImage img;
+  int rows;
+  int cols;
+  int cellsize;
+  boolean init;
+
 
   Visual(FFT fftTemp, AudioPlayer trackTemp) {
     fft = fftTemp;
@@ -72,10 +77,15 @@ class Visual {
     fft.window(FFT.HAMMING);
     t = trackTemp;
     type = 2;
+    init = true;
   }
 
   void toggle(int i) {
-    type = (type + i) % num;
+    if (i == 1)
+      type = (type + i) % num;
+    else
+      type = (type + i + num + 1) % num;
+    init = true;
   }
 
   void visualize()
@@ -86,26 +96,26 @@ class Visual {
 
     if (type == 0) {
       visual1();
-      init1();
     } 
     else if (type == 1) {
       visual2();
-      init2();
     } 
     else if (type == 2) {
       visual3();
-      init3();
+    } 
+    else if (type == 3) {
+      visual4();
     }
 
     popMatrix();
   }
 
-  void init1() {
-    bandSize = 25;
-    strokeWeight(10);
-  }
-
   void visual1() {
+    if (init) {
+      bandSize = 25;
+      strokeWeight(10); 
+      init = true;
+    }
     background(128*sin(c)+127);
     stroke(255);
     translate(0, -offset);
@@ -119,18 +129,18 @@ class Visual {
     }
   }
 
-  void init2() {
-    bandSize = 25;
-    strokeWeight(10);
-  }
-
   void visual2() {
+    if (init) {
+      bandSize = 25;
+      strokeWeight(10);
+      init = true;
+    }
     background(0);
     stroke(255);
     translate(0, -offset);
     for (int i = 0; i < fft.specSize(); i++) {
       decay[i] = decay[i] * 0.95 + fft.getBand(i);
-      stroke(128*sin(i+10*c)+127, 128*sin(i+PI/2+10*c)+127, 128*cos(i-10*c)+127, 64); 
+      stroke(128*sin(i+10*c)+127, 128*sin(i+PI/2+10*c)+127, 128*cos(i-10*c)+127, 64 - decay[i]); 
       pushMatrix();
       translate(0, 0, fft.getBand(i)*25);
       ellipse(width/2*sin(i-c)+width/2 + decay[i], height/2*cos(i-c)+height/2 + decay[i], decay[i]/10, decay[i]/10);
@@ -141,11 +151,11 @@ class Visual {
     }
   }
 
-  void init3() {
-    noStroke();
-  }
-
   void visual3() {
+    if (init) {
+      noStroke();
+      init = true;
+    }
     background(0);
     stroke(255);
     for (int i = 0; i < fft.specSize(); i++) {
@@ -154,33 +164,45 @@ class Visual {
       translate((width/3+decay[i])*cos(c*50+i), (height/3+decay[i])*sin(c*50+i), fft.getBand(i)*0.5 - i*2);
       fill(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
       stroke(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
-      if(i % 2 == 0)
+      if (i % 2 == 0)
         rect(width/2-decay[i]/2, height/2-decay[i]/2, decay[i], decay[i]);
       else
         rect(width/2, height/2, decay[i], decay[i]);      
       popMatrix();
     }
   }
-  
-  void init4() {
-    
-  }
-  
+
   void visual4() {
+    if (init) {
+      img  = loadImage("trippy.jpg");
+      cellsize = 2;
+      cols = img.height/cellsize;
+      rows = img.width/cellsize;
+      noStroke();
+      loadPixels();
+      init = true;
+    }
     background(0);
-    stroke(255);
+
     for (int i = 0; i < fft.specSize(); i++) {
       decay[i] = decay[i] * 0.9 + fft.getBand(i);
-      pushMatrix();
-      translate((width/3+decay[i])*cos(c*50+i), (height/3+decay[i])*sin(c*50+i), fft.getBand(i)*0.5 - i*2);
-      fill(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
-      stroke(128*sin(i+c*5)+127, 128*sin(i+PI/2+c*5)+127, 128*cos(i-c*5)+127, random(256));
-      if(i % 2 == 0)
-        rect(width/2-decay[i]/2, height/2-decay[i]/2, decay[i], decay[i]);
-      else
-        rect(width/2, height/2, decay[i], decay[i]);      
-      popMatrix();
-    }    
+    }
+
+    translate(width/4, height/4);
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        int x = i*cellsize + cellsize/2;
+        int y = j*cellsize + cellsize/2;
+        int loc = x + y*img.width;
+        color c = img.pixels[loc];
+        int b = (int)((red(c) + green(c) + blue(c))/8);
+        pushMatrix();
+        translate(i,j, decay[b]);
+        fill(c);
+        rect(0, 0, cellsize, cellsize);
+        popMatrix();
+      }
+    }
   }
 }
 
